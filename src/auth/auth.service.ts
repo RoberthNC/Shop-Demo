@@ -9,14 +9,15 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto, LoginUserDto } from './dto';
 import * as bcrypt from 'bcrypt';
+import { CommonService } from '../common/common.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly logger: CommonService,
   ) {}
-  private readonly logger = new Logger('Bootstrap');
 
   async register(createUserDto: CreateUserDto) {
     try {
@@ -49,7 +50,7 @@ export class AuthService {
     if (error.code === '23505') {
       this.logger.log(error.detail);
       throw new InternalServerErrorException(
-        'Error al crear el usuario, revise la consola por favor',
+        'Error al crear el usuario, revise la consola por favor.',
       );
     }
   }

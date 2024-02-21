@@ -1,7 +1,6 @@
 import {
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
@@ -9,14 +8,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
 import { PaginationDto } from '../common/dtos/pagination.dto';
+import { CommonService } from '../common/common.service';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    private readonly logger: CommonService,
   ) {}
-  private readonly logger = new Logger('Bootstrap');
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
     try {
@@ -71,7 +71,7 @@ export class CategoryService {
     if (error.code === '23505') {
       this.logger.log(error.detail);
       throw new InternalServerErrorException(
-        'Ya existe un registro en la Base de Datos',
+        'Error al crear la categoría, revise la consola por favor.',
       );
     }
   }

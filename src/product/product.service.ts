@@ -10,14 +10,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { CommonService } from 'src/common/common.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    private readonly logger: CommonService,
   ) {}
-  private readonly logger = new Logger('Bootstrap');
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
     try {

@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { CommonService } from './common.service';
 
 @Module({
-  controllers: [],
-  providers: [],
+  providers: [CommonService],
+  exports: [CommonService],
 })
 export class CommonModule {}
