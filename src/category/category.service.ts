@@ -1,6 +1,6 @@
 import {
-  BadRequestException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -70,7 +70,7 @@ export class CategoryService {
   private handleErrors(error: any) {
     if (error.code === '23505') {
       this.logger.log(error.detail);
-      throw new BadRequestException(
+      throw new InternalServerErrorException(
         'Ya existe un registro en la Base de Datos',
       );
     }

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -27,13 +32,23 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-    return 'Login';
+    const { email, password } = loginUserDto;
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+    if (!user)
+      throw new UnauthorizedException('Credenciales inválidas (correo)');
+    if (!bcrypt.compareSync(password, user.password))
+      throw new UnauthorizedException('Credenciales inválidas (contraseña)');
+    return user;
   }
 
   private handleError(error: any) {
     if (error.code === '23505') {
       this.logger.log(error.detail);
-      throw new BadRequestException(
+      throw new InternalServerErrorException(
         'Error al crear el usuario, revise la consola por favor',
       );
     }

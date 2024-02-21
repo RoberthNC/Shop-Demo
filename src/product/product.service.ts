@@ -3,6 +3,7 @@ import {
   BadRequestException,
   NotFoundException,
   Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -72,7 +73,7 @@ export class ProductService {
   private handleErrors(error: any) {
     if (error.code === '23505') {
       this.logger.log(error.detail);
-      throw new BadRequestException(
+      throw new InternalServerErrorException(
         'Ya existe un producto igual en la Base de Datos',
       );
     }
