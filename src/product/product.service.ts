@@ -75,7 +75,7 @@ export class ProductService {
     if (error.code === '23505') {
       this.logger.log(error.detail);
       throw new InternalServerErrorException(
-        'Ya existe un producto igual en la Base de Datos',
+        'Error al crear el producto, revise la consola por favor.',
       );
     }
   }
