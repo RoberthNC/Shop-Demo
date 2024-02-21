@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,6 +16,8 @@ export class ProductService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
   ) {}
+  private readonly logger = new Logger('Bootstrap');
+
   async create(createProductDto: CreateProductDto): Promise<Product> {
     try {
       const product = this.productRepository.create(createProductDto);
@@ -67,9 +70,11 @@ export class ProductService {
   }
 
   private handleErrors(error: any) {
-    if (error.code === '23505')
+    if (error.code === '23505') {
+      this.logger.log(error.detail);
       throw new BadRequestException(
         'Ya existe un producto igual en la Base de Datos',
       );
+    }
   }
 }

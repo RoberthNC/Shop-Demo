@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
@@ -15,6 +16,8 @@ export class CategoryService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
   ) {}
+  private readonly logger = new Logger('Bootstrap');
+
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
     try {
       const category = this.categoryRepository.create(createCategoryDto);
@@ -65,9 +68,11 @@ export class CategoryService {
   }
 
   private handleErrors(error: any) {
-    if (error.code === '23505')
+    if (error.code === '23505') {
+      this.logger.log(error.detail);
       throw new BadRequestException(
         'Ya existe un registro en la Base de Datos',
       );
+    }
   }
 }
