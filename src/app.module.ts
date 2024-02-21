@@ -3,6 +3,7 @@ import { CategoryModule } from './category/category.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CommonModule } from './common/common.module';
     }),
     CategoryModule,
     CommonModule,
+    ProductModule,
   ],
   controllers: [],
   providers: [],

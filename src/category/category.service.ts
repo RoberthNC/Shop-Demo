@@ -24,7 +24,7 @@ export class CategoryService {
     }
   }
 
-  findAll(paginationDto: PaginationDto) {
+  findAll(paginationDto: PaginationDto): Promise<Category[]> {
     const { limit = 3, offset = 0 } = paginationDto;
     return this.categoryRepository.find({
       skip: offset,
@@ -32,14 +32,17 @@ export class CategoryService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Category> {
     const category = await this.categoryRepository.findOneBy({ id });
     if (!category)
       throw new NotFoundException(`No existe la categoría con el id: ${id}`);
     return category;
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
     try {
       const category = await this.categoryRepository.preload({
         id,
@@ -55,7 +58,7 @@ export class CategoryService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<string> {
     const category = await this.findOne(id);
     await this.categoryRepository.remove(category);
     return 'Categoría eliminada correctamente';
