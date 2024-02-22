@@ -5,7 +5,7 @@ export class CommonService {
   constructor() {}
   private readonly logger = new Logger('Bootstrap');
 
-  log(message: any) {
-    this.logger.log(message);
+  error(message: any) {
+    this.logger.error(message);
   }
 }

@@ -73,7 +73,7 @@ export class ProductService {
 
   private handleErrors(error: any) {
     if (error.code === '23505') {
-      this.logger.log(error.detail);
+      this.logger.error(error.detail);
       throw new InternalServerErrorException(
         'Error al crear el producto, revise la consola por favor.',
       );

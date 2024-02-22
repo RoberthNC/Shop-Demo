@@ -48,7 +48,7 @@ export class AuthService {
 
   private handleError(error: any) {
     if (error.code === '23505') {
-      this.logger.log(error.detail);
+      this.logger.error(error.detail);
       throw new InternalServerErrorException(
         'Error al crear el usuario, revise la consola por favor.',
       );
