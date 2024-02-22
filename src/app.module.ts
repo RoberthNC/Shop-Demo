@@ -6,6 +6,7 @@ import { CommonModule } from './common/common.module';
 import { ProductModule } from './product/product.module';
 import { AuthModule } from './auth/auth.module';
 import { OrderModule } from './order/order.module';
+import { OrderProductModule } from './orderproduct/orderproduct.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { OrderModule } from './order/order.module';
     ProductModule,
     AuthModule,
     OrderModule,
+    OrderProductModule,
   ],
   controllers: [],
   providers: [],
