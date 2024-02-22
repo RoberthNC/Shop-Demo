@@ -1,25 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOrderDto, UpdateOrderDto } from './dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Order } from './entities/order.entity';
+import { Repository } from 'typeorm';
+import { CommonService } from 'src/common/common.service';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 
 @Injectable()
 export class OrderService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+    private readonly logger: CommonService,
+  ) {}
+
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    try {
+      const order = this.orderRepository.create(createOrderDto);
+      return await this.orderRepository.save(order);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  findAll() {
-    return `This action returns all order`;
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+    return await this.orderRepository.find({
+      skip: offset,
+      take: limit,
+      relations: ['user'],
+    });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} order`;
+  async findOne(id: string) {
+    const order = await this.orderRepository.findOneBy({ id });
+    if (!order)
+      throw new NotFoundException(`Pedido con id: ${id} no fue encontrado`);
+    return order;
   }
 
-  update(id: string, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(id: string, updateOrderDto: UpdateOrderDto) {
+    try {
+      const order = await this.orderRepository.preload({
+        id,
+        ...updateOrderDto,
+      });
+      if (!order)
+        throw new NotFoundException(
+          `No existe el pedido con el id: ${id} para actualizarlo`,
+        );
+      return await this.orderRepository.save(order);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} order`;
+  async remove(id: string) {
+    const order = await this.findOne(id);
+    await this.orderRepository.remove(order);
+    return 'Pedido eliminado correctamente';
+  }
+
+  private handleError(error: any) {
+    if (error.code === '23505') {
+      this.logger.error(error);
+      throw new InternalServerErrorException(
+        'Error al crear el pedido, revise la consola por favor.',
+      );
+    }
   }
 }
