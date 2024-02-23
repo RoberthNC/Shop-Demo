@@ -1,10 +1,12 @@
 import { Category } from 'src/category/entities/category.entity';
+import { OrderProduct } from 'src/orderproduct/entities/order-product.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -38,6 +40,9 @@ export class Product {
     { eager: true }, //* Trae las relaciones con las otras tablas para optimizar la consulta de la BD
   )
   category: string;
+
+  @OneToMany(() => OrderProduct, (orderproduct) => orderproduct.product)
+  orderproduct: string;
 
   @BeforeInsert()
   checkBeforeInsertProduct() {

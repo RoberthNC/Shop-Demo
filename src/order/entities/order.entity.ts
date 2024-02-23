@@ -1,5 +1,12 @@
 import { User } from 'src/auth/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { OrderProduct } from 'src/orderproduct/entities/order-product.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Order {
@@ -14,4 +21,7 @@ export class Order {
 
   @ManyToOne(() => User, (user) => user.order)
   user: string;
+
+  @OneToMany(() => OrderProduct, (orderproduct) => orderproduct.order)
+  orderproduct: string;
 }
