@@ -1,15 +1,16 @@
 import {
   Injectable,
   InternalServerErrorException,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto, LoginUserDto } from './dto';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CommonService } from '../common/common.service';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -17,23 +18,29 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly logger: CommonService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
     try {
-      const { password, ...restCreateUserDto } = createUserDto;
+      const { password: passwordRegister, ...restCreateUserDto } =
+        createUserDto;
       const user = this.userRepository.create({
         ...restCreateUserDto,
-        password: bcrypt.hashSync(password, 10),
+        password: bcrypt.hashSync(passwordRegister, 10),
       });
-      return await this.userRepository.save(user);
+      const { password, ...rest } = await this.userRepository.save(user);
+      return {
+        ...rest,
+        token: this.generateJwt({ id: user.id, name: user.name }),
+      };
     } catch (error) {
       this.handleErrors(error);
     }
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const { email, password } = loginUserDto;
+    const { email, password: passwordLogin } = loginUserDto;
     const user = await this.userRepository.findOne({
       where: {
         email,
@@ -41,9 +48,18 @@ export class AuthService {
     });
     if (!user)
       throw new UnauthorizedException('Credenciales inválidas (correo)');
-    if (!bcrypt.compareSync(password, user.password))
+    if (!bcrypt.compareSync(passwordLogin, user.password))
       throw new UnauthorizedException('Credenciales inválidas (contraseña)');
-    return user;
+    const { password, ...rest } = user;
+    return {
+      ...rest,
+      token: await this.generateJwt({ id: user.id, name: user.name }),
+    };
+  }
+
+  private async generateJwt(payload: JwtPayload): Promise<String> {
+    const token = await this.jwtService.signAsync(payload);
+    return token;
   }
 
   private handleErrors(error: any) {
