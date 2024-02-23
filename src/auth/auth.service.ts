@@ -28,7 +28,7 @@ export class AuthService {
       });
       return await this.userRepository.save(user);
     } catch (error) {
-      this.handleError(error);
+      this.handleErrors(error);
     }
   }
 
@@ -46,7 +46,7 @@ export class AuthService {
     return user;
   }
 
-  private handleError(error: any) {
+  private handleErrors(error: any) {
     if (error.code === '23505') {
       this.logger.error(error.detail);
       throw new InternalServerErrorException(

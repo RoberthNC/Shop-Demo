@@ -23,7 +23,7 @@ export class OrderService {
       const order = this.orderRepository.create(createOrderDto);
       return await this.orderRepository.save(order);
     } catch (error) {
-      this.handleError(error);
+      this.handleErrors(error);
     }
   }
 
@@ -55,7 +55,7 @@ export class OrderService {
         );
       return await this.orderRepository.save(order);
     } catch (error) {
-      this.handleError(error);
+      this.handleErrors(error);
     }
   }
 
@@ -65,7 +65,7 @@ export class OrderService {
     return 'Pedido eliminado correctamente';
   }
 
-  private handleError(error: any) {
+  private handleErrors(error: any) {
     if (error.code === '23505') {
       this.logger.error(error);
       throw new InternalServerErrorException(
