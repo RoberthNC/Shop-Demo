@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { OrderProductService } from './orderproduct.service';
 import { CreateOrderProductDto, UpdateOrderProductDto } from './dto';
@@ -27,20 +28,20 @@ export class OrderProductController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.orderproductService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateOrderproductDto: UpdateOrderProductDto,
   ) {
     return this.orderproductService.update(id, updateOrderproductDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.orderproductService.remove(id);
   }
 }
